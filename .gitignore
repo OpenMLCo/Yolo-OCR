@@ -6,6 +6,15 @@ __pycache__/
 # C extensions
 *.so
 
+# yolo weights, onnx and engine (TensorRT)
+*.weights
+*.onnx
+*.engine
+
+# OS generated files
+*.DS_store
+*.DS_store?
+
 # Distribution / packaging
 .Python
 build/
