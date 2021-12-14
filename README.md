@@ -6,7 +6,7 @@ Character recognition form yolo detections
 
 1. Clone this repo
   ```
-  git clone https://github.com/OpenMLCo/TensorRT-Yolo-Deepsort.git
+  git clone https://github.com/OpenMLCo/Yolo-OCR.git
   ```
 
 2. Download pre-training weights and include this file in weights folder.
