@@ -1,5 +1,6 @@
 classes= 2
-train  = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/train.txt
-valid  = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/test.txt
-names = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/obj.names
-backup = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/
+#train  = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/train.txt
+#valid  = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/test.txt
+#names = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/obj.names
+names = /content/Yolo-OCR/Yolo-OCR/Yolo4_RUT/obj.names
+#backup = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo_RUT/
