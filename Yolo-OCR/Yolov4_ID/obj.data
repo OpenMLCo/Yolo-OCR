@@ -1,6 +1,7 @@
 classes= 4
 #train  = /content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/train.txt
 #valid  = /content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/test.txt
-names = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.names
+#names = /content/drive/MyDrive/Proyectos/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.names
+names = /content/Yolo-OCR/Yolo-OCR/Yolo4_ID/obj.names
 #names = /content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.names
 #backup = /content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/
