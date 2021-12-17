@@ -239,36 +239,27 @@ def extract_info_cedula(image, detections, img_cedula_raw):
     results_dict[detections[j][0]]=real_info.upper()
   return results_dict
 
-def main_rut(image_raw,config_file,data_file,weights,
+
+class main_rut():
+    def __init__(self,config_file,data_file,weights,
                 thresh):
-#   args = parser()
-#   input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
-#   config_file= args.config_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom.cfg'
-#   data_file= args.data_file #'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.data'
-#   weights= args.weights#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom_best.weights'
-#   batch_size = args.batch_size#1
-#   thresh = args.thresh#0.25
-  random.seed(0)  # deterministic bbox colors
-  network, class_names, class_colors = darknet.load_network(
-      config_file,
-      data_file,
-      weights,
-      batch_size=1
-  )
+        self.config_file=config_file
+        self.data_file=data_file
+        self.weights=weights
+        self.thresh=thresh
 
-  #images = load_images(input_file)
-  #image_name = images[0]
-  #image_raw = cv2.imread(image_name)
-  image, detections = image_detection(
-          image_raw, network, class_names, class_colors, thresh
-          )
-  # image, detections, image_name
-  results_dict = extract_info_cedula(image, detections, image_raw)
-  print(results_dict)
-  return results_dict
+    def load_darknet(self,):
+        random.seed(0)  # deterministic bbox colors
+        self.network, self.class_names, self.class_colors = darknet.load_network(
+            self.config_file,
+            self.data_file,
+            self.weights,
+            batch_size=1
+        )
 
-
-# if __name__ == "__main__":
-#     # unconmment next line for an example of batch processing
-#     # batch_detection_example()
-#     main()
+    def main_cedula_run(self,image_raw):
+        image, detections = image_detection(
+            image_raw, self.network, self.class_names, self.class_colors, self.thresh)
+        results_dict = extract_info_cedula(image, detections, image_raw)
+        print(results_dict)
+        return results_dict
