@@ -11,6 +11,8 @@ import unidecode
 import cv2
 from extract_info_cedula import main_cedula
 from extract_info_RUT import main_rut
+from pdf2image import convert_from_bytes,convert_from_path
+
 def bd_connection(host_db, user, password, db_name, id_user):
     try:
         # Abre conexion con la base de datos
@@ -70,13 +72,16 @@ def compare_metric(string_extracted,string_real):
         i+=1
         jj += j
         break
-  return i/len(string_real)
+  return (2*i)/(len(string_real)+len(string_extracted))
 
 
-path_img_id='ceduYohan.jpeg'
-path_img_rut='rut.jpeg'
-image_raw_id = cv2.imread(path_img_id)
-image_raw_rut = cv2.imread(path_img_rut)
+path_img_id='/content/Yolo-OCR/Yolo-OCR/cedulaRepresentante-56.pdf'
+path_img_rut='/content/Yolo-OCR/Yolo-OCR/registroUnico-56.pdf'
+image_raw_id = convert_from_path(path_img_id)
+image_raw_id = np.asarray(image_raw_id[0])
+image_raw_rut = convert_from_path(path_img_rut)
+image_raw_rut = np.asarray(image_raw_rut[0])
+
 class_id= main_cedula(config.config_file_id,
                                 config.data_file_id,config.weights_id,0.25)
 class_id.load_darknet()
@@ -92,6 +97,22 @@ ip_server = '190.7.134.180'
 username_bd = 'julian_c'
 password_bd = 'Julian_c_unal_2021'
 database = 'pruebas_adr'
-id_user = 120
-response = get_info(ip_server, username_bd, password_bd,
-                         database, id_user)
+id_user = int(re.findall(r'\d+', path_img_id)[0])
+response = get_info(config.ip_server, config.username_bd, 
+                    config.password_bd,config.database, id_user)
+
+nombres_metric=compare_metric(result_id['nombres'],
+                response['data']['Nombres'].values[0])
+apellidos_metric=compare_metric(result_id['apellidos'],
+               response['data']['Apellidos'].values[0])
+numero_metric=compare_metric(result_id['numero'],
+               response['data']['identificacion'].values[0])
+nit_metric=compare_metric(result_rut['NIT'],
+               response['data']['nit'].values[0])
+rs_metric=compare_metric(result_rut['RS'],
+               response['data']['name'].values[0])
+print('nombres_metric',nombres_metric)
+print('apellidos_metric',apellidos_metric)
+print('numero_metric',numero_metric)
+print('nit_metric',nit_metric)
+print('rs_metric',rs_metric)
