@@ -6,13 +6,16 @@ import pandas as pd
 import numpy as np
 import re
 import pymysql
+import config
 import unidecode
-
+import cv2
+from extract_info_cedula import main_cedula
+from extract_info_RUT import main_rut
+from numba import cuda 
 def bd_connection(host_db, user, password, db_name, id_user):
     try:
         # Abre conexion con la base de datos
         conn = pymysql.connect(host=host_db, user=user, password=password, database=db_name)
-
         # Query para extraer la data de la base de datos
         sql_query = pd.read_sql_query('''
                                        SELECT 
@@ -31,7 +34,6 @@ def bd_connection(host_db, user, password, db_name, id_user):
 
 def get_info(ip_server, username_bd, password_bd,
                          database, id_user):
-
     data = bd_connection(ip_server, username_bd, password_bd,
                          database, id_user)
     if data.empty:
@@ -59,6 +61,22 @@ def get_info(ip_server, username_bd, password_bd,
         message = 'ok'
         response = {'response': message, 'data': data.to_json(orient="records")}
         return response
+
+
+path_img_id='ceduYohan.jpeg'
+path_img_rut='rut.jpeg'
+image_raw = cv2.imread(path_img_id)
+results_dict_id = main_cedula(image_raw,config.config_file_id,
+                                config.data_file_id,config.weights_id,0.25)
+device = cuda.get_current_device()
+device.reset()                             
+image_raw = cv2.imread(path_img_rut)
+results_dict_rut = main_rut(image_raw,config.config_file_rut,
+                            config.data_file_rut,config.weights_rut,0.25)
+device = cuda.get_current_device()
+device.reset()
+print(results_dict_id)
+print(results_dict_rut)
 
 
 ip_server = '190.7.134.180'
