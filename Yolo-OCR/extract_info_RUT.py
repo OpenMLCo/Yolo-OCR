@@ -173,8 +173,8 @@ def batch_detection_example():
         cv2.imwrite(name.replace("data/", ""), image)
     print(detections)
 
-def extract_info_cedula(image, detections, image_name):
-  img_cedula_raw = cv2.imread(image_name)
+def extract_info_cedula(image, detections, img_cedula_raw):
+  # img_cedula_raw = cv2.imread(image_name)
   img_cedula_raw = cv2.cvtColor(img_cedula_raw, cv2.COLOR_BGR2RGB)
   hmax,wmax,_=img_cedula_raw.shape
   requeriments=['NIT', 'RS']
@@ -239,29 +239,31 @@ def extract_info_cedula(image, detections, image_name):
     results_dict[detections[j][0]]=real_info.upper()
   return results_dict
 
-def main():
-  args = parser()
-  input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
-  config_file= args.config_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom.cfg'
-  data_file= args.data_file #'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.data'
-  weights= args.weights#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom_best.weights'
-  batch_size = args.batch_size#1
-  thresh = args.thresh#0.25
+def main_rur(image_raw,config_file,data_file,weights,
+                thresh):
+#   args = parser()
+#   input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
+#   config_file= args.config_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom.cfg'
+#   data_file= args.data_file #'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.data'
+#   weights= args.weights#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom_best.weights'
+#   batch_size = args.batch_size#1
+#   thresh = args.thresh#0.25
   random.seed(0)  # deterministic bbox colors
   network, class_names, class_colors = darknet.load_network(
       config_file,
       data_file,
       weights,
-      batch_size=batch_size
+      batch_size=1
   )
 
-  images = load_images(input_file)
-  image_name = images[0]
+  #images = load_images(input_file)
+  #image_name = images[0]
+  #image_raw = cv2.imread(image_name)
   image, detections = image_detection(
-          image_name, network, class_names, class_colors, thresh
+          image_raw, network, class_names, class_colors, thresh
           )
-  image, detections, image_name
-  results_dict = extract_info_cedula(image, detections, image_name)
+  # image, detections, image_name
+  results_dict = extract_info_cedula(image, detections, image_raw)
   print(results_dict)
   return results_dict
 

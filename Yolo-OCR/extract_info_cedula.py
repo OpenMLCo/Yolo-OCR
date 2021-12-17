@@ -1,36 +1,36 @@
 # Extraer bounding boxes
 from pytesseract import Output
 import pytesseract
-import imutils
-import argparse
+# import imutils
+# import argparse
 import os
 import glob
 import random
 import darknet
-import time
+# import time
 import cv2
 import numpy as np
 import darknet
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
-def parser():
-    parser = argparse.ArgumentParser(description="YOLO Object Detection")
-    parser.add_argument("--input_file", type=str, default="",
-                        help="image source. It can be a single image, a"
-                        "txt with paths to them, or a folder. Image valid"
-                        " formats are jpg, jpeg or png."
-                        "If no input is given, ")
-    parser.add_argument("--batch_size", default=1, type=int,
-                        help="number of images to be processed at the same time")
-    parser.add_argument("--weights", default="yolov4.weights",
-                        help="yolo weights path")
-    parser.add_argument("--config_file", default="./cfg/yolov4.cfg",
-                        help="path to config file")
-    parser.add_argument("--data_file", default="./cfg/coco.data",
-                        help="path to data file")
-    parser.add_argument("--thresh", type=float, default=.25,
-                        help="remove detections with lower confidence")
-    return parser.parse_args()
+# def parser():
+#     parser = argparse.ArgumentParser(description="YOLO Object Detection")
+#     parser.add_argument("--input_file", type=str, default="",
+#                         help="image source. It can be a single image, a"
+#                         "txt with paths to them, or a folder. Image valid"
+#                         " formats are jpg, jpeg or png."
+#                         "If no input is given, ")
+#     parser.add_argument("--batch_size", default=1, type=int,
+#                         help="number of images to be processed at the same time")
+#     parser.add_argument("--weights", default="yolov4.weights",
+#                         help="yolo weights path")
+#     parser.add_argument("--config_file", default="./cfg/yolov4.cfg",
+#                         help="path to config file")
+#     parser.add_argument("--data_file", default="./cfg/coco.data",
+#                         help="path to data file")
+#     parser.add_argument("--thresh", type=float, default=.25,
+#                         help="remove detections with lower confidence")
+#     return parser.parse_args()
 
 def check_batch_shape(images, batch_size):
     """
@@ -82,14 +82,14 @@ def prepare_batch(images, network, channels=3):
     return darknet.IMAGE(width, height, channels, darknet_images)
 
 
-def image_detection(image_path, network, class_names, class_colors, thresh):
+def image_detection(image, network, class_names, class_colors, thresh):
     # Darknet doesn't accept numpy images.
     # Create one with image we reuse for each detect
     width = darknet.network_width(network)
     height = darknet.network_height(network)
     darknet_image = darknet.make_image(width, height, 3)
 
-    image = cv2.imread(image_path)
+    # image = cv2.imread(image_path)
     image_rgb = cv2.cvtColor(image, cv2.COLOR_BGR2RGB)
     image_resized = cv2.resize(image_rgb, (width, height),
                                interpolation=cv2.INTER_LINEAR)
@@ -173,8 +173,8 @@ def batch_detection_example():
         cv2.imwrite(name.replace("data/", ""), image)
     print(detections)
 
-def extract_info_cedula(image, detections, image_name):
-  img_cedula_raw = cv2.imread(image_name)
+def extract_info_cedula(image, detections, img_cedula_raw):
+#   img_cedula_raw = cv2.imread(image_name)
   img_cedula_raw = cv2.cvtColor(img_cedula_raw, cv2.COLOR_BGR2RGB)
   hmax,wmax,_=img_cedula_raw.shape
   requeriments=['nombres', 'numero', 'apellidos', 'cedula']
@@ -229,29 +229,31 @@ def extract_info_cedula(image, detections, image_name):
     results_dict[detections[j][0]]=real_info.upper()
   return results_dict
 
-def main():
-  args = parser()
-  input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
-  config_file= args.config_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom.cfg'
-  data_file= args.data_file #'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.data'
-  weights= args.weights#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom_best.weights'
-  batch_size = args.batch_size#1
-  thresh = args.thresh#0.25
+def main_cedula(image_raw,config_file,data_file,weights,
+                thresh):
+#   args = parser()
+#   input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
+#   config_file= args.config_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom.cfg'
+#   data_file= args.data_file #'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/obj.data'
+#   weights= args.weights#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/Yolo/yolov4_custom_best.weights'
+#   batch_size = args.batch_size#1
+#   thresh = args.thresh#0.25
   random.seed(0)  # deterministic bbox colors
   network, class_names, class_colors = darknet.load_network(
       config_file,
       data_file,
       weights,
-      batch_size=batch_size
+      batch_size=1
   )
 
-  images = load_images(input_file)
-  image_name = images[0]
+  #images = load_images(input_file)
+  #image_name = images[0]
+  #image_raw = cv2.imread(image_name)
   image, detections = image_detection(
-          image_name, network, class_names, class_colors, thresh
+          image_raw, network, class_names, class_colors, thresh
           )
-  image, detections, image_name
-  results_dict = extract_info_cedula(image, detections, image_name)
+#   image, detections, image_name
+  results_dict = extract_info_cedula(image, detections, image_raw)
   print(results_dict)
   return results_dict  
 
