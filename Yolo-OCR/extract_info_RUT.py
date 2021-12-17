@@ -239,7 +239,7 @@ def extract_info_cedula(image, detections, img_cedula_raw):
     results_dict[detections[j][0]]=real_info.upper()
   return results_dict
 
-def main_rur(image_raw,config_file,data_file,weights,
+def main_rut(image_raw,config_file,data_file,weights,
                 thresh):
 #   args = parser()
 #   input_file = args.input_file#'/content/drive/MyDrive/OpenMLCo/ADR_OCR/ARchivosBios/ARchivosBios/cedulacamy.jpeg'
