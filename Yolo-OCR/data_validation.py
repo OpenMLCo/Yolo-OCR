@@ -82,44 +82,97 @@ def compare_metric(string_extracted,string_real):
 def check_number(file_name):
   return any(char.isdigit() for char in file_name)
 
-path_img_id='/content/Yolo-OCR/Yolo-OCR/cedulaRepresentante-56.pdf'
-path_img_rut='/content/Yolo-OCR/Yolo-OCR/registroUnico-56.pdf'
-image_raw_id = convert_from_path(path_img_id)
-image_raw_id = np.asarray(image_raw_id[0])
-image_raw_rut = convert_from_path(path_img_rut)
-image_raw_rut = np.asarray(image_raw_rut[0])
-
-class_id= main_cedula(config.config_file_id,
-                                config.data_file_id,config.weights_id,0.25)
-class_id.load_darknet()
-class_rut= main_rut(config.config_file_rut,
-                            config.data_file_rut,config.weights_rut,0.25)
-class_rut.load_darknet()
-
-result_id = class_id.main_cedula_run(image_raw_id)
-result_rut = class_rut.main_cedula_run(image_raw_rut)
-
-ip_server = '190.7.134.180'
-# Authentication data for BD pruebas
-username_bd = 'julian_c'
-password_bd = 'Julian_c_unal_2021'
-database = 'pruebas_adr'
-id_user = int(re.findall(r'\d+', path_img_id)[0])
-response = get_info(config.ip_server, config.username_bd, 
-                    config.password_bd,config.database, id_user)
-
-nombres_metric=compare_metric(result_id['nombres'],
-                response['data']['Nombres'].values[0])
-apellidos_metric=compare_metric(result_id['apellidos'],
-               response['data']['Apellidos'].values[0])
-numero_metric=compare_metric(result_id['numero'],
-               response['data']['identificacion'].values[0])
-nit_metric=compare_metric(result_rut['NIT'],
-               response['data']['nit'].values[0])
-rs_metric=compare_metric(result_rut['RS'],
-               response['data']['name'].values[0])
-print('nombres_metric',nombres_metric)
-print('apellidos_metric',apellidos_metric)
-print('numero_metric',numero_metric)
-print('nit_metric',nit_metric)
-print('rs_metric',rs_metric)
+def main():
+  # load darknet
+  class_id= main_cedula(config.config_file_id,
+                                  config.data_file_id,config.weights_id,0.25)
+  class_id.load_darknet()
+  class_rut= main_rut(config.config_file_rut,
+                              config.data_file_rut,config.weights_rut,0.25)
+  class_rut.load_darknet()
+  ## load info
+  folder_path=config.folder_path
+  folder_names = os.listdir(folder_path)
+  filer_required=config.filer_required
+  columns=config.columns
+  df=pd.DataFrame(columns=columns)
+  for folder in folder_names:
+    files_names = os.listdir(folder_path+folder)
+    log = ''
+    file_numbers=[re.findall(r'\d+', files)[0] for files in files_names if check_number(files)]
+    if len(file_numbers)>0:
+      file_numbers=np.unique(file_numbers)
+    else:
+      elements = {'folde_ID':folder,
+              'cedulaRepresentante':'no',
+              'registroUnico':'no',
+              'certificadoExistencia':'no',
+              'Log':'NO existen archivos con - numero',
+              'ID':'',
+              'cedulaRepresentante_match':'no',
+              'registroUnico_match':'no',
+              'prob_cedula_nombres':0,
+              'prob_cedula_apellidos':0,
+              'prob_cedula_numero':0,
+              'prob_rut_RS':0,
+              'prob_rut_NIT':0}
+      df = df.append(elements, ignore_index = True)
+      continue
+    for number_id in file_numbers:
+      response = get_info(config.ip_server, config.username_bd, 
+                      config.password_bd,config.database, number_id)
+      elements = {'folde_ID':folder,
+                  'cedulaRepresentante':'no',
+                  'registroUnico':'no',
+                  'certificadoExistencia':'no',
+                  'Log':'',
+                  'ID':number_id,
+                  'cedulaRepresentante_match':'no',
+                  'registroUnico_match':'no',
+                  'prob_cedula_nombres':0,
+                  'prob_cedula_apellidos':0,
+                  'prob_cedula_numero':0,
+                  'prob_rut_RS':0,
+                  'prob_rut_NIT':0}
+      if not response:
+        elements['Log']=log+'El ID no existe en la base de datos'
+        df = df.append(elements, ignore_index = True)
+        continue
+      element_names = [file_name for file_name in files_names if number_id in file_name] 
+      for file_name in element_names:
+        if file_name.split('-')[0] in filer_required:
+          try:
+            image = np.asarray(convert_from_path(folder_path+folder+'/'+file_name,last_page=1,thread_count=-1)[0])
+            elements[file_name.split('-')[0]] = 'si'
+            if file_name.split('-')[0]=='cedulaRepresentante':
+              result_id = class_id.main_cedula_run(image)
+              # extract info OCR
+              elements['prob_cedula_nombres']=np.round(100*compare_metric(re.sub(r'\W+', '', result_id['nombres']),
+                                            response['data']['Nombres'].values[0]),1)
+              elements['prob_cedula_apellidos']=np.round(100*compare_metric(re.sub(r'\W+', '',result_id['apellidos']),
+                                            response['data']['Apellidos'].values[0]),1)
+              elements['prob_cedula_numero']=np.round(100*compare_metric(re.sub(r'\W+', '',result_id['numero']),
+                                            response['data']['identificacion'].values[0]),1)
+              if elements['prob_cedula_numero'] >= 90:
+                elements['cedulaRepresentante_match']='si'
+              elif (int(elements['prob_cedula_numero'] >= 70) + int(elements['prob_cedula_nombres']>=70) + int(elements['prob_cedula_apellidos']>=70)) >= 2:
+                elements['cedulaRepresentante_match']='si'
+            elif file_name.split('-')[0]=='registroUnico':
+              result_rut = class_rut.main_cedula_run(image)
+              #extract info OCR
+              elements['prob_rut_NIT']=np.round(100*compare_metric(re.sub(r'\W+', '', result_rut['NIT']),
+                            response['data']['nit'].values[0]),1)
+              elements['prob_rut_RS']=np.round(100*compare_metric(re.sub(r'\W+', '', result_rut['RS']),
+                            response['data']['name'].values[0]),1)
+              if elements['prob_rut_NIT'] >= 90 or elements['prob_rut_RS'] >= 80:
+                elements['registroUnico_match']='si'
+              elif np.mean(elements['prob_rut_NIT']+elements['prob_rut_RS'])>= 70:
+                elements['registroUnico_match']='si'
+              print(folder_path+folder+'/'+file_name)
+          except:
+            log += 'no se peude abrir archivo {}'.format(file_name)
+        else:
+          log += 'Error archivo {} no esta en lista de requeridos'.format(file_name)+'\n'
+      elements['Log']=log
+      df = df.append(elements, ignore_index = True)
+  return df

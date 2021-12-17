@@ -181,9 +181,10 @@ def extract_info_cedula(image, detections, img_cedula_raw):
   names = [detection[0] for detection in detections]
   names = np.unique(names)
   if set(requeriments)-set(names) != set():
-    print('Error -- repetir imagen de cedula')
+    log = 'Extracted box {}'.format(names)
   else:
     names_to_extract_info=['NIT', 'RS']
+    log = 'Extracted box {}'.format(names)
   results_dict={}
   for j in range(len(detections)):
     x, y, w, h = convert2relative(image, detections[j][-1])
@@ -237,7 +238,7 @@ def extract_info_cedula(image, detections, img_cedula_raw):
       real_info = [info for info in real_info.split(' ') if len(info)>2]
       real_info = ' '.join(real_info)
     results_dict[detections[j][0]]=real_info.upper()
-  return results_dict
+  return results_dict, log
 
 
 class main_rut():
@@ -260,6 +261,6 @@ class main_rut():
     def main_cedula_run(self,image_raw):
         image, detections = image_detection(
             image_raw, self.network, self.class_names, self.class_colors, self.thresh)
-        results_dict = extract_info_cedula(image, detections, image_raw)
-        print(results_dict)
-        return results_dict
+        results_dict, log = extract_info_cedula(image, detections, image_raw)
+        #print(results_dict)
+        return results_dict, log
