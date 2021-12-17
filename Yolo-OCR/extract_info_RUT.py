@@ -189,7 +189,7 @@ def extract_info_cedula(image, detections, img_cedula_raw):
     x, y, w, h = convert2relative(image, detections[j][-1])
     if not detections[j][0] in names_to_extract_info:
       continue
-    print(x, y, w, h)
+    #print(x, y, w, h)
     if (x-(w/2))<0:
       xtmp = 0
     else:

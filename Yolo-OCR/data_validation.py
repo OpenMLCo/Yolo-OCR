@@ -58,9 +58,19 @@ def get_info(ip_server, username_bd, password_bd,
         data['Apellidos'] = data['Apellidos'].apply(lambda x: unidecode.unidecode(x).replace('  ', ' ').strip())
         data['name'] = data['name'].apply(lambda x: unidecode.unidecode(x).replace('  ', ' '))
         message = 'ok'
-        response = {'response': message, 'data': data.to_json(orient="records")}
+        response = {'response': message, 'data': data}
         return response
 
+def compare_metric(string_extracted,string_real):
+  i=0
+  jj=0
+  for element_extracted in string_extracted:
+    for j,element_real in enumerate(string_real[jj:]):
+      if element_extracted==element_real:        
+        i+=1
+        jj += j
+        break
+  return i/len(string_real)
 
 
 path_img_id='ceduYohan.jpeg'
@@ -73,6 +83,9 @@ class_id.load_darknet()
 class_rut= main_rut(config.config_file_rut,
                             config.data_file_rut,config.weights_rut,0.25)
 class_rut.load_darknet()
+
+result_id = class_id.main_cedula_run(image_raw_id)
+result_rut = class_rut.main_cedula_run(image_raw_rut)
 
 ip_server = '190.7.134.180'
 # Authentication data for BD pruebas
