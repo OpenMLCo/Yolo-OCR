@@ -11,7 +11,6 @@ import unidecode
 import cv2
 from extract_info_cedula import main_cedula
 from extract_info_RUT import main_rut
-from numba import cuda 
 def bd_connection(host_db, user, password, db_name, id_user):
     try:
         # Abre conexion con la base de datos
@@ -63,21 +62,17 @@ def get_info(ip_server, username_bd, password_bd,
         return response
 
 
+
 path_img_id='ceduYohan.jpeg'
 path_img_rut='rut.jpeg'
-image_raw = cv2.imread(path_img_id)
-results_dict_id = main_cedula(image_raw,config.config_file_id,
+image_raw_id = cv2.imread(path_img_id)
+image_raw_rut = cv2.imread(path_img_rut)
+class_id= main_cedula(config.config_file_id,
                                 config.data_file_id,config.weights_id,0.25)
-device = cuda.get_current_device()
-device.reset()                             
-image_raw = cv2.imread(path_img_rut)
-results_dict_rut = main_rut(image_raw,config.config_file_rut,
+class_id.load_darknet()
+class_rut= main_rut(config.config_file_rut,
                             config.data_file_rut,config.weights_rut,0.25)
-device = cuda.get_current_device()
-device.reset()
-print(results_dict_id)
-print(results_dict_rut)
-
+class_rut.load_darknet()
 
 ip_server = '190.7.134.180'
 # Authentication data for BD pruebas
