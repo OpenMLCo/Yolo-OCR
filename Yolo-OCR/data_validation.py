@@ -170,7 +170,7 @@ def main():
                 elements['registroUnico_match']='si'
               elif np.mean(elements['prob_rut_NIT']+elements['prob_rut_RS'])>= 70:
                 elements['registroUnico_match']='si'
-              print(folder_path+folder+'/'+file_name)
+            print(folder_path+folder+'/'+file_name)
           except:
             log += 'no se peude abrir archivo {}'.format(file_name)
         else:
