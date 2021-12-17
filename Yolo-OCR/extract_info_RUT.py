@@ -263,9 +263,10 @@ def main():
   image, detections, image_name
   results_dict = extract_info_cedula(image, detections, image_name)
   print(results_dict)
+  return results_dict
 
 
-if __name__ == "__main__":
-    # unconmment next line for an example of batch processing
-    # batch_detection_example()
-    main()
+# if __name__ == "__main__":
+#     # unconmment next line for an example of batch processing
+#     # batch_detection_example()
+#     main()
