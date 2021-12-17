@@ -59,6 +59,11 @@ def get_info(ip_server, username_bd, password_bd,
         data['Nombres'] = data['Nombres'].apply(lambda x: unidecode.unidecode(x).replace('  ', ' ').strip())
         data['Apellidos'] = data['Apellidos'].apply(lambda x: unidecode.unidecode(x).replace('  ', ' ').strip())
         data['name'] = data['name'].apply(lambda x: unidecode.unidecode(x).replace('  ', ' '))
+        # obtener solo elemntos alphanuemricos
+        data['Nombres'] = data['Nombres'].apply(lambda x: re.sub(r'\W+', '', x))
+        data['Apellidos'] = data['Apellidos'].apply(lambda x: re.sub(r'\W+', '', x))
+        data['name'] = data['name'].apply(lambda x: re.sub(r'\W+', '', x))
+        
         message = 'ok'
         response = {'response': message, 'data': data}
         return response
@@ -74,6 +79,8 @@ def compare_metric(string_extracted,string_real):
         break
   return (2*i)/(len(string_real)+len(string_extracted))
 
+def check_number(file_name):
+  return any(char.isdigit() for char in file_name)
 
 path_img_id='/content/Yolo-OCR/Yolo-OCR/cedulaRepresentante-56.pdf'
 path_img_rut='/content/Yolo-OCR/Yolo-OCR/registroUnico-56.pdf'
