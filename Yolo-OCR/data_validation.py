@@ -12,6 +12,8 @@ import cv2
 from extract_info_cedula import main_cedula
 from extract_info_RUT import main_rut
 from pdf2image import convert_from_bytes,convert_from_path
+from tqdm import tqdm
+import time
 
 def bd_connection(host_db, user, password, db_name, id_user):
     try:
@@ -96,7 +98,7 @@ def main():
   filer_required=config.filer_required
   columns=config.columns
   df=pd.DataFrame(columns=columns)
-  for folder in folder_names:
+  for folder in tqdm(folder_names, desc = 'Progress'):
     files_names = os.listdir(folder_path+folder)
     log = ''
     file_numbers=[re.findall(r'\d+', files)[0] for files in files_names if check_number(files)]
