@@ -23,3 +23,5 @@ columns=['folde_ID','cedulaRepresentante','registroUnico',
 
 #folder path
 folder_path='files2/files/'
+#folder save pandas dataframe
+save_excel_path = '/content/Yolo-OCR/Yolo-OCR/Resultado.xlsx'

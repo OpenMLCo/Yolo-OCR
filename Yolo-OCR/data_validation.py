@@ -145,7 +145,8 @@ def main():
             image = np.asarray(convert_from_path(folder_path+folder+'/'+file_name,last_page=1,thread_count=-1)[0])
             elements[file_name.split('-')[0]] = 'si'
             if file_name.split('-')[0]=='cedulaRepresentante':
-              result_id = class_id.main_cedula_run(image)
+              result_id,log_ = class_id.main_cedula_run(image)
+              log+=log_+'\n'
               # extract info OCR
               elements['prob_cedula_nombres']=np.round(100*compare_metric(re.sub(r'\W+', '', result_id['nombres']),
                                             response['data']['Nombres'].values[0]),1)
@@ -158,7 +159,8 @@ def main():
               elif (int(elements['prob_cedula_numero'] >= 70) + int(elements['prob_cedula_nombres']>=70) + int(elements['prob_cedula_apellidos']>=70)) >= 2:
                 elements['cedulaRepresentante_match']='si'
             elif file_name.split('-')[0]=='registroUnico':
-              result_rut = class_rut.main_cedula_run(image)
+              result_rut,log_ = class_rut.main_cedula_run(image)
+              log+=log_+'\n'
               #extract info OCR
               elements['prob_rut_NIT']=np.round(100*compare_metric(re.sub(r'\W+', '', result_rut['NIT']),
                             response['data']['nit'].values[0]),1)
@@ -175,4 +177,8 @@ def main():
           log += 'Error archivo {} no esta en lista de requeridos'.format(file_name)+'\n'
       elements['Log']=log
       df = df.append(elements, ignore_index = True)
-  return df
+  df.to_excel(config.save_excel_path,index=False)
+
+if __name__ == '__main__':
+  #run main
+  main()
